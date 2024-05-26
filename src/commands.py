@@ -22,9 +22,11 @@ def extract_commands(text: str) -> List[Command]:
     )
 
     reply = chat_completion.choices[0].message.content
-    print(f"[commands] LLM reply: {reply}")
 
-    return _json_to_commands(json.loads(reply))
+    commands_json = json.loads(reply)
+    print(f"[commands] Extracted commands: {json.dumps(commands_json)}")
+
+    return _json_to_commands(commands_json)
 
 
 # ------------------------------------------------------------------------------
@@ -37,8 +39,12 @@ def _json_to_commands(json_object: dict) -> List[Command]:
     for command_data in json_object["commands"]:
         name = command_data[0]
         params = command_data[1]
-        command = Command(name, params)
-        commands.append(command)
+
+        if isinstance(name, str) and isinstance(params, list) and all(isinstance(param, int) for param in params):
+            command = Command(name, params)
+            commands.append(command)
+        else:
+            print(f"[commands] Invalid command: {json.dumps(command_data)}")
 
     return commands
 
@@ -52,12 +58,14 @@ prompt = """
 You are a simple robot engine, controlling the Thymio robot.
 Based on the user message, respond with the appropriate command array, using the
 following JSON output:
+```json
 {
     "commands": [
         [ "<command_name>", [command_params] ],
         ...
     ]
 }
+```
 
 Commands are:
 - name "move.forward" // starts the motors
@@ -65,6 +73,7 @@ Commands are:
 - name "move.backward" // starts the motors
   params [speed]: one integer from 20 to 300
 - name "stop" // stops the motors
+  params []: empty array
 - name "light" // sets the top LEDs color
   params [red, green, blue]: 3 integers from 0 to 32
 - name "sound" // plays a sound for the given duration
