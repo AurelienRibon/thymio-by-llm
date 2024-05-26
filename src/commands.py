@@ -83,10 +83,10 @@ Commands are:
 
 Ideas:
 Use the "sound" command to communicate feelings with the user.
+Chain multiple "sound" commands to play a melody!
+Prefer short sounds, 10/60th of seconds, like piano notes, for a better user experience.
 You can use multiple commands in a single response, be creative!
 You can return an empty array if there is nothing to do.
-Chain multiple "sound" and/or "wait" commands to play a melody!
-Prefer quick sounds, like piano notes, for a better user experience.
 
 Examples:
 - User: "Play a DO-RE-MI melody!"
