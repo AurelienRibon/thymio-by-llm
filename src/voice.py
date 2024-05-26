@@ -68,12 +68,13 @@ def transcribe_voice(audio_file_path: str, lang: str) -> str:
             file=file,
             language=lang,
             model="whisper-1",
-            response_format="text",
             temperature=0.2,
         )
 
-        print(f"[voice] Transcription: {response.text}")
-        return response.text
+        text = response.text.strip()
+        print(f"[voice] Transcription: {text}")
+
+        return text
 
 
 # ------------------------------------------------------------------------------
