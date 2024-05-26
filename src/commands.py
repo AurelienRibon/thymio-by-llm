@@ -10,12 +10,12 @@ class Command:
         self.params = params
 
 
-def extract_commands(text: str) -> List[Command]:
+def extract_commands(chat: List[str]) -> List[Command]:
     client = openai.OpenAI()
     chat_completion = client.chat.completions.create(
         messages=[
             {"role": "system", "content": prompt},
-            {"role": "user", "content": text},
+            *[{"role": "user", "content": msg} for msg in chat],
         ],
         model="gpt-4o",
         response_format={"type": "json_object"},

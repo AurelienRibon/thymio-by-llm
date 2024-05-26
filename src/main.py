@@ -13,15 +13,17 @@ def run() -> None:
     atexit.register(thymio_stop)
     thymio_start("src-thymio/program.py")
 
+    chat = []
+
     while True:
         audio_path = record_voice()
         if not audio_path:
             continue
 
         text = transcribe_voice(audio_path, lang=LANG, prompt=PROMPT)
-        commands = extract_commands(text)
+        chat.append(text)
 
-        for command in commands:
+        for command in extract_commands(chat):
             process_command(command)
 
 
