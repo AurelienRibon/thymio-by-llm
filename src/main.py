@@ -5,6 +5,9 @@ from commands import Command, extract_commands
 from thymio import thymio_send, thymio_start, thymio_stop
 from voice import record_voice, transcribe_voice
 
+LANG = "fr"
+PROMPT = "Tu es Thymio, un robot."
+
 
 def run() -> None:
     atexit.register(thymio_stop)
@@ -15,7 +18,7 @@ def run() -> None:
         if not audio_path:
             continue
 
-        text = transcribe_voice(audio_path, lang="fr")
+        text = transcribe_voice(audio_path, lang=LANG, prompt=PROMPT)
         commands = extract_commands(text)
 
         for command in commands:

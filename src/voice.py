@@ -61,7 +61,7 @@ def record_voice() -> str:
             return _write_mp3_file(buffers)
 
 
-def transcribe_voice(audio_file_path: str, lang: str) -> str:
+def transcribe_voice(audio_file_path: str, lang: str, prompt: str) -> str:
     with open(audio_file_path, "rb") as file:
         client = openai.OpenAI()
         response = client.audio.transcriptions.create(
@@ -69,6 +69,7 @@ def transcribe_voice(audio_file_path: str, lang: str) -> str:
             language=lang,
             model="whisper-1",
             temperature=0.2,
+            prompt=prompt,
         )
 
         text = response.text.strip()
@@ -169,7 +170,7 @@ def _write_mp3_file(buffers):
 if __name__ == "__main__":
     audio_file_path = record_voice()
     if audio_file_path:
-        text = transcribe_voice(audio_file_path, lang="fr")
+        text = transcribe_voice(audio_file_path, lang="fr", prompt="Tu es Thymio.")
         print(f"[voice] Transcribed: {text}")
     else:
         print("[voice] Recording failed.")
