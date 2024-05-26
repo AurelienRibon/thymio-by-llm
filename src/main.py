@@ -8,7 +8,7 @@ from voice import record_voice, transcribe_voice
 
 def run() -> None:
     atexit.register(thymio_stop)
-    thymio_start()
+    thymio_start('src-thymio/program.py')
 
     while True:
         audio_path = record_voice()
