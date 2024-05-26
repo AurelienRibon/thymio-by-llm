@@ -5,8 +5,19 @@ from commands import Command, extract_commands
 from thymio import thymio_send, thymio_start, thymio_stop
 from voice import record_voice, transcribe_voice
 
-LANG = "fr"
-PROMPT = "Tu es Thymio, un robot."
+# ------------------------------------------------------------------------------
+# CONFIG
+# ------------------------------------------------------------------------------
+
+LANG = "fr" # language for speech recognition
+PROMPT = "Tu es Thymio, un robot." # prompt to help speech recognition
+SILENCE_DURATION_THRESHOLD = 0.5  # seconds at low volume for silence detection
+SILENCE_VOLUME_THRESHOLD = 80  # volume threshold for silence detection
+AUDIO_MIN_DURATION = 0.5  # minimum duration of non-silence recording before stopping
+
+# ------------------------------------------------------------------------------
+# MAIN
+# ------------------------------------------------------------------------------
 
 
 def run() -> None:
@@ -16,7 +27,12 @@ def run() -> None:
     chat = []
 
     while True:
-        audio_path = record_voice()
+        audio_path = record_voice(
+            silence_duration_threshold=SILENCE_DURATION_THRESHOLD,
+            silence_volume_threshold=SILENCE_VOLUME_THRESHOLD,
+            audio_min_duration=AUDIO_MIN_DURATION,
+        )
+
         if not audio_path:
             continue
 

@@ -9,12 +9,9 @@ AUDIO_FORMAT = pyaudio.paInt16
 AUDIO_CHANNELS = 1
 BYTES_PER_SECOND = 44100
 BYTES_PER_BUFFER = 1024
-SILENCE_DURATION_THRESHOLD = 0.5
-SILENCE_AVG_THRESHOLD = 80
-MIN_AUDIO_DURATION = 0.5
 
 
-def record_voice() -> str:
+def record_voice(*, silence_duration_threshold=0.5, silence_volume_threshold=80, audio_min_duration=0.5) -> str:
     audio, stream = _start_audio_stream()
     buffers = []
     silence_duration = 0
@@ -27,10 +24,10 @@ def record_voice() -> str:
 
         # Calculate the average volume of the buffer
         buffer_avg = int(sum(buffer) / len(buffer))
-        _print_record_buffer(buffer_avg)
+        _print_record_buffer(buffer_avg, silence_volume_threshold)
 
         # If the volume is above the threshold, we continue recording
-        if buffer_avg > SILENCE_AVG_THRESHOLD:
+        if buffer_avg > silence_volume_threshold:
             silence_duration = 0
             continue
 
@@ -38,19 +35,19 @@ def record_voice() -> str:
         silence_duration += BYTES_PER_BUFFER / BYTES_PER_SECOND
 
         # While silence duration is low, we continue recording
-        if silence_duration < SILENCE_DURATION_THRESHOLD:
+        if silence_duration < silence_duration_threshold:
             continue
 
         # We got a silence, but we need to check if the buffers contain anything
         # meaningful. For that we trim leading and trailing silence.
         print("\n[voice] Silence detected.")
-        buffers = _trim_leading_silence(buffers)
-        buffers = _trim_trailing_silence(buffers)
+        buffers = _trim_leading_silence(buffers, silence_volume_threshold)
+        buffers = _trim_trailing_silence(buffers, silence_volume_threshold)
 
         # Once leading and trailing silence is trimmed, we check if the
         # recording is long enough. If not, we continue recording.
         duration = len(buffers) * BYTES_PER_BUFFER / BYTES_PER_SECOND
-        if duration < MIN_AUDIO_DURATION:
+        if duration < audio_min_duration:
             print(f"[voice] Recording too short ({duration:.2f}s), continuing.")
             _print_record_start()
             buffers = []
@@ -83,19 +80,19 @@ def transcribe_voice(audio_file_path: str, lang: str, prompt: str) -> str:
 # ------------------------------------------------------------------------------
 
 
-def _trim_leading_silence(buffers):
+def _trim_leading_silence(buffers, silence_volume_threshold):
     for i, buffer in enumerate(buffers):
         avg = sum(buffer) / len(buffer)
-        if avg > SILENCE_AVG_THRESHOLD:
+        if avg > silence_volume_threshold:
             return buffers[i:]
     return []
 
 
-def _trim_trailing_silence(buffers):
+def _trim_trailing_silence(buffers, silence_volume_threshold):
     frames_reversed = reversed(buffers)
     for i, buffer in enumerate(frames_reversed):
         avg = sum(buffer) / len(buffer)
-        if avg > SILENCE_AVG_THRESHOLD:
+        if avg > silence_volume_threshold:
             return buffers[: len(buffers) - i]
     return []
 
@@ -132,8 +129,8 @@ def _print_record_start():
     print("[voice] Recording: ", end="", flush=True)
 
 
-def _print_record_buffer(avg):
-    msg = f"{avg}! " if avg > SILENCE_AVG_THRESHOLD else f"{avg} "
+def _print_record_buffer(avg, silence_volume_threshold):
+    msg = f"{avg}! " if avg > silence_volume_threshold else f"{avg} "
     print(msg, end="", flush=True)
 
 
