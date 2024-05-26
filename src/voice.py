@@ -23,7 +23,7 @@ def record_voice(*, silence_duration_threshold=0.5, silence_volume_threshold=80,
         buffers.append(buffer)
 
         # Calculate the average volume of the buffer
-        buffer_avg = int(sum(buffer) / len(buffer))
+        buffer_avg = sum(buffer) // len(buffer)
         _print_record_buffer(buffer_avg, silence_volume_threshold)
 
         # If the volume is above the threshold, we continue recording
