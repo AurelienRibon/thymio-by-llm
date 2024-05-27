@@ -60,24 +60,30 @@ Based on the user message, respond with the appropriate command array, using the
 following JSON output:
 ```json
 {
-    "commands": [
-        [ "<command_name>", [command_params] ],
-        ...
-    ]
+  "commands": [
+    [ "<command_name>", [command_params] ],
+    ...
+  ]
 }
 ```
 
 Commands are:
 - name "move.forward" // starts the motors
-  params [speed]: one integer from 20 to 300
+  params [speed]: an integer from 20 to 300
 - name "move.backward" // starts the motors
-  params [speed]: one integer from 20 to 300
+  params [speed]: an integer from 20 to 300
+- name "spin.right" // starts spinning clockwise
+  params [speed]: an integer from 20 to 300
+- name "spin.left" // starts spinning counterclockwise
+  params [speed]: an integer from 20 to 300
 - name "stop" // stops the motors
   params []: empty array
-- name "light" // sets the top LEDs color
-  params [red, green, blue]: 3 integers from 0 to 32
 - name "sound" // plays a sound for the given duration
   params [frequency, duration]: frequency in Hz and duration in 60th of a second
+- name "led_top" // sets the color of the LED on the robot top
+  params [red, green, blue]: 3 integers from 0 to 32
+- name "leds_circle" // sets the brightness of the circle LEDs on the robot top
+  params [b0, b1, b2, b3, b4, b5, b6, b7]: 8 integers from 0 to 32
 - name "wait" // waits for the given duration before executing the next command
   params [duration]: duration in 60th of a second
 
